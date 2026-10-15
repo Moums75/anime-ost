@@ -1,0 +1,44 @@
+# Lance tout le projet : docker compose up --build   →   http://localhost:8080
+# Prérequis : un fichier .env à la racine (copie de .env.example avec tes secrets).
+services:
+  auth-service:
+    build: ./auth-service
+    env_file: .env
+    volumes:
+      - auth-data:/data
+    restart: unless-stopped
+
+  ost-service:
+    build: ./ost-service
+    env_file: .env
+    volumes:
+      - ost-data:/data
+    restart: unless-stopped
+
+  bff:
+    build: ./bff
+    env_file: .env
+    environment:
+      # Dans Docker, les services se trouvent par leur nom sur le réseau interne
+      AUTH_SERVICE_URL: http://auth-service:8001
+      OST_SERVICE_URL: http://ost-service:8002
+    depends_on:
+      auth-service:
+        condition: service_healthy
+      ost-service:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    # Seul port ouvert vers l'extérieur : le BFF et les API ne sont pas joignables directement
+    ports:
+      - "8080:80"
+    depends_on:
+      bff:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  auth-data:
+  ost-data:

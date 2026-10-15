@@ -31,21 +31,70 @@ Projet M1. Deux langages : **TypeScript** (front + BFF) et **Python** (microserv
 - Les microservices Python exigent un en-tête `X-Internal-Key`. Seul le BFF connaît cette clé, donc on ne peut pas les appeler directement depuis le navigateur.
 - Les routes d'administration (ajout/suppression) sont réservées au rôle `admin`.
 
-## Lancer le projet (Windows)
+## Lancer le projet
+
+### 1. Les secrets (`.env`)
+
+Les mots de passe et clés ne sont pas dans le code : ils sont dans un fichier `.env` à la racine, **ignoré par Git**.
+
+```powershell
+copy .env.example .env   # puis remplace chaque "change-moi"
+# un secret aléatoire : python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+Le compte admin est créé (ou son mot de passe mis à jour) au démarrage avec `ADMIN_USERNAME` / `ADMIN_PASSWORD`. Sans `.env`, des valeurs de développement sont utilisées et un avertissement s'affiche.
+
+### 2a. En local (Windows)
 
 Prérequis : Node.js 20+ et Python 3.11+.
 
 ```powershell
-.\setup.ps1   # une seule fois : crée les venv Python et fait les npm install
+.\setup.ps1   # une seule fois : venv Python + npm install (avec les outils de test)
 .\start.ps1   # ouvre 4 fenêtres (API Auth, API OST, BFF, Front)
 ```
 
 Ouvre ensuite http://localhost:5173.
 
-**Compte admin par défaut** : `admin` / `admin123`.
+### 2b. Avec Docker (n'importe quelle machine)
+
+Prérequis : Docker Desktop (ou Docker Engine + Compose).
+
+```bash
+docker compose up --build
+```
+
+Ouvre ensuite http://localhost:8080. Le front est servi par **nginx**, qui relaie `/api` vers le BFF.
+**Seul le port 8080 est exposé** : le BFF et les deux API ne sont joignables que sur le réseau interne de Docker.
+Les bases SQLite et les fichiers audio sont dans des volumes (`auth-data`, `ost-data`), conservés entre deux redémarrages (`docker compose down -v` pour tout effacer).
 
 Les BDD sont créées automatiquement au premier démarrage, avec un jeu de données de démo (Naruto, Attack on Titan, Evangelion…).
-Pour repartir de zéro, supprime `auth-service/auth.db` et `ost-service/ost.db`.
+En local, pour repartir de zéro, supprime `auth-service/auth.db` et `ost-service/ost.db`.
+
+### Ajouter des fichiers audio en une fois
+
+Mets tes MP3 (des fichiers dont tu as les droits) dans un dossier, nommés comme l'OST (`Gurenge.mp3`, `LiSA - Gurenge.mp3`…), puis :
+
+```powershell
+python scripts\import_audio.py C:\chemin\vers\mes-mp3          # aperçu des correspondances
+python scripts\import_audio.py C:\chemin\vers\mes-mp3 --send   # envoi (identifiants admin du .env)
+```
+
+## Tests
+
+67 tests automatisés, rejoués à chaque push par GitHub Actions (`.github/workflows/tests.yml`) :
+
+| Partie | Outil | Ce qui est testé |
+|---|---|---|
+| API Auth | pytest (17) | inscription, connexion, JWT, hachage bcrypt, blocage après 5 échecs, changement de mot de passe, suppression de compte, ids jamais réutilisés |
+| API Métier | pytest (25) | catalogue, pagination, recherche, envoi et streaming audio (Range / 206), favoris, historique, playlists, scores et classements (anti-triche, égalités), suppression des données |
+| BFF | node:test (6) | extraction des ID YouTube, adaptation des OST pour le front, limite par IP |
+| Front | Vitest (19) | moteur du mini-jeu (jugements, combo, score, notes), génération des notes |
+
+```powershell
+.\test.ps1          # tout lancer
+```
+
+Chaque service peut aussi être testé seul : `python -m pytest` (dans un service Python, avec son venv) ou `npm test` (bff, frontend). Les tests Python utilisent une base temporaire : ils ne touchent jamais à tes données.
 
 ## Documentation des API
 
@@ -110,7 +159,7 @@ Code : `frontend/src/game/` (`chart.ts` génération des notes, `engine.ts` règ
 
 ## Variables d'environnement
 
-Toutes ont une valeur par défaut pour le développement.
+Elles se règlent dans `.env` (modèle : `.env.example`). Toutes ont une valeur par défaut pour le développement.
 
 | Variable | Service | Défaut |
 |---|---|---|
