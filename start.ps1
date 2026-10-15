@@ -1,4 +1,4 @@
-# Lance les 4 briques du projet, chacune dans sa propre fenêtre
+﻿# Lance les 4 briques du projet, chacune dans sa propre fenêtre
 $root = $PSScriptRoot
 
 $services = @(

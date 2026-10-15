@@ -1,11 +1,11 @@
-# Installe toutes les dépendances du projet (à lancer une seule fois)
+﻿# Installe toutes les dépendances du projet (à lancer une seule fois)
 $ErrorActionPreference = "Stop"
 
 foreach ($svc in "auth-service", "ost-service") {
     Write-Host "== $svc (Python)" -ForegroundColor Cyan
     Push-Location "$PSScriptRoot\$svc"
     python -m venv .venv
-    .\.venv\Scripts\python -m pip install -q -r requirements.txt
+    .\.venv\Scripts\python -m pip install -q -r requirements-dev.txt  # dépendances + outils de test
     Pop-Location
 }
 
