@@ -1,0 +1,6 @@
+# Fins de ligne Unix dans le dépôt (nécessaire pour Docker / Linux)
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.webp binary
+*.gif binary
