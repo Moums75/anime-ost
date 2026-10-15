@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from .database import get_db
 from .deps import get_or_404
-from .models import ListeningEntry, Ost, Playlist, PlaylistItem
+from .models import Favorite, GameScore, ListeningEntry, Ost, Playlist, PlaylistItem
 from .schemas import (
     HistoryEntryOut, HistoryIn, HistoryPage, PlaylistDetail, PlaylistIn, PlaylistOrder,
     PlaylistPatch, PlaylistSummary,
@@ -32,6 +32,22 @@ def _now() -> datetime:
 def _as_utc(value: datetime) -> datetime:
     # SQLite renvoie des dates sans fuseau : on les considère en UTC
     return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+
+
+# ---------- Suppression de compte ----------
+
+@router.delete("")
+def delete_user_data(user_id: int, db: Session = Depends(get_db)):
+    """Efface tout ce qui appartient à un utilisateur (appelé par le BFF à la suppression du compte)."""
+    deleted = {}
+    for label, model in (("favorites", Favorite), ("history", ListeningEntry), ("game_scores", GameScore)):
+        deleted[label] = db.execute(delete(model).where(model.user_id == user_id)).rowcount
+    playlists = db.scalars(select(Playlist).where(Playlist.user_id == user_id)).all()
+    for playlist in playlists:
+        db.delete(playlist)  # supprime aussi son contenu (cascade)
+    deleted["playlists"] = len(playlists)
+    db.commit()
+    return deleted
 
 
 # ---------- Historique ----------

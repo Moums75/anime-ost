@@ -47,6 +47,9 @@ export const api = {
   register: (c: Credentials) => request<AuthResponse>("/auth/register", "POST", c),
   login: (c: Credentials) => request<AuthResponse>("/auth/login", "POST", c),
   me: () => request<User>("/auth/me"),
+  changePassword: (currentPassword: string, newPassword: string) =>
+    request<void>("/auth/password", "PUT", { current_password: currentPassword, new_password: newPassword }),
+  deleteAccount: (password: string) => request<void>("/auth/me", "DELETE", { password }),
 
   animes: () => request<Anime[]>("/animes"),
   anime: (id: string) => request<AnimeDetail>(`/animes/${id}`),

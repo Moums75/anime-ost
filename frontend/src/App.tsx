@@ -4,6 +4,7 @@ import { useAuth } from "./auth";
 import Navbar from "./components/Navbar";
 import PlayerBar from "./components/PlayerBar";
 import { usePlayer } from "./player";
+import Account from "./pages/Account";
 import Admin from "./pages/Admin";
 import AnimeDetail from "./pages/AnimeDetail";
 import Animes from "./pages/Animes";
@@ -46,6 +47,7 @@ export default function App() {
           <Route path="/playlists/:id" element={<Protected><PlaylistDetail /></Protected>} />
           <Route path="/historique" element={<Protected><History /></Protected>} />
           <Route path="/admin" element={<Protected admin><Admin /></Protected>} />
+          <Route path="/compte" element={<Protected><Account /></Protected>} />
           <Route path="*" element={<p className="muted">Page introuvable.</p>} />
         </Routes>
       </main>

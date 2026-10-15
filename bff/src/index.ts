@@ -9,6 +9,8 @@ import { libraryRouter } from "./routes/library.js";
 import { HttpError } from "./services.js";
 
 const app = express();
+// Derrière un proxy local (Vite en dev, nginx dans Docker) : req.ip = vraie adresse du client
+app.set("trust proxy", "loopback, uniquelocal");
 
 app.use(cors({ origin: config.corsOrigin }));
 app.use(express.json());

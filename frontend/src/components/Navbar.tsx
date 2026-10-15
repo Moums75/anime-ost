@@ -28,7 +28,7 @@ export default function Navbar() {
       <div className="navbar__user">
         {user ? (
           <>
-            <span className="avatar" title={user.username}>{user.username[0].toUpperCase()}</span>
+            <Link to="/compte" className="avatar" title={`Mon compte (${user.username})`}>{user.username[0].toUpperCase()}</Link>
             <button
               className="btn btn-ghost btn-sm"
               onClick={() => {

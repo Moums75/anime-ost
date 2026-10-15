@@ -8,6 +8,8 @@ from .database import Base
 
 class User(Base):
     __tablename__ = "users"
+    # Un id supprimé n'est jamais réattribué (voir ensure_users_autoincrement)
+    __table_args__ = {"sqlite_autoincrement": True}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(30), unique=True, index=True)
