@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from "react";
+import { startTransition, useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api";
 import { useAuth } from "../auth";
@@ -55,8 +55,10 @@ export default function Account() {
     setDeleting(true);
     try {
       await api.deleteAccount(deletePassword);
-      logout();
+      // React Router navigue dans une transition : on y met aussi la déconnexion pour que les deux
+      // s'appliquent ensemble (sinon la page protégée redirige d'abord vers /login).
       navigate("/", { replace: true });
+      startTransition(logout);
     } catch (err) {
       setDeleteMessage({ text: (err as Error).message, error: true });
       setDeleting(false);

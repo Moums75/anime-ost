@@ -1,3 +1,4 @@
+import { startTransition } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth";
 import { MusicIcon } from "./Icons";
@@ -32,8 +33,9 @@ export default function Navbar() {
             <button
               className="btn btn-ghost btn-sm"
               onClick={() => {
-                logout();
+                // Même transition que la navigation : sinon une page protégée redirigerait vers /login
                 navigate("/");
+                startTransition(logout);
               }}
             >
               Déconnexion
