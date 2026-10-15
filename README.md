@@ -67,6 +67,19 @@ Ouvre ensuite http://localhost:8080. Le front est servi par **nginx**, qui relai
 **Seul le port 8080 est exposé** : le BFF et les deux API ne sont joignables que sur le réseau interne de Docker.
 Les bases SQLite et les fichiers audio sont dans des volumes (`auth-data`, `ost-data`), conservés entre deux redémarrages (`docker compose down -v` pour tout effacer).
 
+Commandes utiles (Docker Desktop doit être lancé) :
+
+| Commande | Effet |
+|---|---|
+| `docker compose up --build -d` | construit et lance tout en arrière-plan (3 à 5 min la 1re fois) |
+| `docker compose up -d` | relance sans reconstruire (environ 20 s) |
+| `docker compose ps` | état des 4 services (`healthy` = prêt) |
+| `docker compose logs -f bff` | journaux d'un service en direct (Ctrl+C pour quitter) |
+| `docker compose down` | arrête et supprime les conteneurs, **garde les données** |
+| `docker compose down -v` | arrête et **efface les données** (bases + fichiers audio) |
+
+La version Docker a ses propres bases (dans les volumes), distinctes de celles de `start.ps1`. Les deux peuvent tourner en même temps (ports 8080 et 5173).
+
 Les BDD sont créées automatiquement au premier démarrage, avec un jeu de données de démo (Naruto, Attack on Titan, Evangelion…).
 En local, pour repartir de zéro, supprime `auth-service/auth.db` et `ost-service/ost.db`.
 
