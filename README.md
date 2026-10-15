@@ -1,5 +1,7 @@
 # AnimeOST
 
+[![Tests](https://github.com/Moums75/anime-ost/actions/workflows/tests.yml/badge.svg)](https://github.com/Moums75/anime-ost/actions/workflows/tests.yml)
+
 Site de référencement d'OST d'anime (openings, endings, bandes originales), construit en architecture microservices.
 Projet M1. Deux langages : **TypeScript** (front + BFF) et **Python** (microservices).
 
